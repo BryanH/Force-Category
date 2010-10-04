@@ -35,11 +35,6 @@ if (!class_exists("ForceCategories")) {
 				'classname' => 'force_categories',
 				'description' => __('Forces user posts to include and/or exclude specified categories', 'force_categories')
 			);
-//			$control_ops = array (
-//				'width' => 300,
-//				'height' => 350,
-//				'id_base' => 'force_categories-plugin'
-//			);
 			add_action('plugins_loaded', array (
 				$this,
 				'register_plugin'
@@ -102,11 +97,12 @@ if (!class_exists("ForceCategories")) {
 		/*
 		 * Get the styles installed
 		 */
-function fc_style_enqueue(){
+		function fc_style_enqueue() {
 			$css_source = $this->get_css_location("force_cat.css");
-			wp_enqueue_style($this->plugin->dom, "/wp-content/plugins/force_categories/stylesheets/force_cat.css");//$css_source );
-			wp_print_styles( $this->plugin->dom );
-}
+//			wp_enqueue_style($this->plugin->dom, "/wp-content/plugins/force_categories/stylesheets/force_cat.css");
+			wp_enqueue_style($this->plugin->dom, $css_source );
+//			wp_print_styles($this->plugin->dom);
+		}
 		/*
 		 * Option screen
 		 */
@@ -114,7 +110,6 @@ function fc_style_enqueue(){
 			if (!current_user_can('edit_user')) {
 				wp_die(__('You do not have sufficient permissions to access this page.'));
 			}
-
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "options.php"); ?>
 
@@ -136,10 +131,8 @@ function fc_style_enqueue(){
 		 */
 		function get_css_location($css) {
 			$admin_css = '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . 'stylesheets/' . $css;
-			$css_location =
-				WP_PLUGIN_DIR . $admin_css
-//				WP_PLUGIN_URL . $admin_css
-;
+			$css_location = WP_PLUGIN_DIR . $admin_css			//				WP_PLUGIN_URL . $admin_css
+	;
 			return $css_location;
 		}
 	}
@@ -158,7 +151,10 @@ if (isset ($force_cats)) {
 			& $force_cats,
 			'fc_options'
 		));
-		add_action('admin_init', array( & $force_cats, 'fc_style_enqueue' ));
+		add_action('admin_head', array (
+			& $force_cats,
+			'fc_style_enqueue'
+		));
 		//		add_action('admin_init', array (
 		//			& $force_cats,
 		//			'register_mysettings'
