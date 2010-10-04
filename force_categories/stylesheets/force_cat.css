@@ -1,0 +1,40 @@
+.catactions{
+  height:45px;
+  position:relative;
+  text-align:center;
+  top:75px;
+  width:20px
+}
+
+.catpick{
+  width:140px
+}
+
+.catselect{
+  border:3px blue inset;
+  width:105px
+}
+
+.dropcap{
+  color:#0e7ff1;
+  float:left;
+  font-size:300%;
+  font-weight:bold;
+  margin:-10px 0 0 0
+}
+
+.spacer{
+  clear:both;
+  padding:3px
+}
+
+#catres{
+  background:#fdf4c3;
+  border:5px #554702 dashed;
+  width:700px
+}
+
+#musthave,#mustactions,#categories,#cantactions,#canthave{
+  float:left;
+  padding:0 20px
+}
