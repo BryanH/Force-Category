@@ -1,11 +1,11 @@
 == Installation ==
 
-1) Unpack the files into the "/wp-content/plugins/truncate-rss" directory
+1) Unpack the files into the "/wp-content/plugins/force_categories" directory
 
 2) Activate the plugin through the 'Plugins' menu in WordPress
 
-3) Go into the admin tool and click on the settings menu. You will see a "Truncate-RSS" link in that menu. Click that and then change any options you wish. 
+3) Edit a specific user and look for the 'Force Categories' section. Assign whichever categories to the Include or Exclude boxes.
 
-4) Click save
+4) Save the user record.
 
 Happy blogging!
