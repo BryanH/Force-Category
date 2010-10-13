@@ -4,8 +4,15 @@ Force Categories
 Force Categories is a Wordpress plugin that affects an author's posts with respect to categories.
 Every post by a specific author can be:
 
-1. Forced to belong to one or more specified categories
-1. Prevented from belonging to one or more specified categories
+1. Forced to belong to one or more specified categories (custom taxonomies)
+1. Prevented from belonging to one or more specified categories (custom taxonomies)
+
+Default taxonomies:
+* Featured
+* Voices
+* Main Well
+
+Additional taxonomies are added as custom to the particular blog (e.g., "More Energy News")
 
 ## Target environment
 This plugin is designed to be used on a multi-author blog (where you allow multiple authors and/or contributors to write posts).

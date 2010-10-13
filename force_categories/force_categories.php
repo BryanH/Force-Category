@@ -2,8 +2,8 @@
 /*
 Plugin Name: Force Categories
 Plugin URI: http://github.com/BryanH/Force_Categories
-Description: Force posts by a user to include one or more specified categories and/or prevent that user from assigning some categories to her posts.
-Version: 0.9
+Description: Force posts by a user to include one or more specified categories (custom taxonomies) and/or prevent that user from assigning some categories (custom taxonomies) to her posts.
+Version: 1.0
 Author: Bryan Hanks, PMP
 Author URI: http://www.chron.com/apps/adbxh0/
 License: GPLv3
@@ -39,6 +39,40 @@ if (!class_exists("ForceCategories")) {
 				$this,
 				'register_plugin'
 			));
+			/*
+			 * Set up taxonomy for niche crap - jam the round peg into the octagonal hole.
+			 * 'cause nothing says "Success" like forcing a blog platform to be a
+			 */
+			 $taxonomy_name = $this->plugin->com . 'subsite';
+			register_taxonomy( $taxonomy_name, 'post', array (
+				'hierarchical' => true,
+				'label' => __('SubSite'),
+				'query_var' => true,
+				'show_tagcloud' => false,
+				'rewrite' => true
+			));
+			/*
+			 * POUND that
+			 */
+			 wp_insert_term( "Featured", $taxonomy_name, array(
+			  'description' => 'Featured posts that will display in the "Featured"/"Spotlight" area',
+			  'slug' => 'featured',
+			  )
+			 );
+
+			 wp_insert_term( "0 - Home Page", $taxonomy_name, array(
+			  'description' => 'Posts that should display on the home page',
+			  'slug' => 'home',
+			  )
+			 );
+			 /*
+			  * Kill some kittens
+			  */
+			 wp_insert_term( "Voices", $taxonomy_name, array(
+			  'description' => 'Voices posts',
+			  'slug' => 'voices',
+			  )
+			 );
 		}
 		// Generic plugin functionality by John Blackbourn
 		function register_plugin() {
@@ -99,41 +133,50 @@ if (!class_exists("ForceCategories")) {
 		 */
 		function fc_style_enqueue() {
 			$css_source = $this->get_css_location("force_cat.css");
-//			wp_enqueue_style($this->plugin->dom, "/wp-content/plugins/force_categories/stylesheets/force_cat.css");
-			wp_enqueue_style($this->plugin->dom, $css_source );
-//			wp_print_styles($this->plugin->dom);
+			//			wp_enqueue_style($this->plugin->dom, "/wp-content/plugins/force_categories/stylesheets/force_cat.css");
+			wp_enqueue_style($this->plugin->dom, $css_source);
+			//			wp_print_styles($this->plugin->dom);
+			echo "<!-- style should go here \n{$css_source}\n-->";
 		}
 		/*
 		 * Option screen
 		 */
 		function fc_options($user) {
-			if (!current_user_can('edit_user')) {
-				wp_die(__('You do not have sufficient permissions to access this page.'));
-			}
+			check_edit_authorization($user);
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "options.php"); ?>
-
-<?php return; ?>
 <?php
 
-			return;
 			add_action('personal_options_update', 'save_fc_options');
 			add_action('edit_user_profile_update', 'save_fc_options');
 		}
 		function save_fc_options($user_id) {
-			update_usermeta_from_post('field1');
+			check_edit_authorization($user_id);
+			update_user_meta($user_id, 'canthave_categories', $_POST['canthave']);
+			update_user_meta($user_id, 'musthave_categories', $_POST['musthave']);
 		}
 		/*
 		 * Obtains the url and file location of a given CSS
-		 * Parameter:	css filename (assumes it lives in the 'stylesheets' directory under the plugin)
-		 * Output: 		file, url to stylesheet.
-		 * Use:			list($cssfile, $cssurl) = get_css_location('somecss.css');
+		 * Parameter: css filename (assumes it lives in the 'stylesheets' directory under the plugin)
+		 * Returns: array of file, url to stylesheet.
+		 * Use:  list($cssfile, $cssurl) = get_css_location('somecss.css');
 		 */
 		function get_css_location($css) {
 			$admin_css = '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . 'stylesheets/' . $css;
-			$css_location = WP_PLUGIN_DIR . $admin_css			//				WP_PLUGIN_URL . $admin_css
-	;
-			return $css_location;
+			return array (
+				$this->plugin->dir . $admin_css,
+				$this->plugin->url . $admin_css
+			);
+		}
+		/*
+		 * Verify the current user can edit the user record
+		 * Parameter: user_id - id of user
+		 * Returns: (nothing) or exception if fail
+		 */
+		function check_edit_authorization($user_id) {
+			if (!current_user_can('edit_user', $user_id)) {
+				wp_die(__('You do not have sufficient permissions to edit this user.'));
+			}
 		}
 	}
 }

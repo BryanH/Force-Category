@@ -5,7 +5,10 @@
 <div class="spacer"></div>
 <div id="musthave" class="catpick">
 <h2>Must have</h2>
-<select class="catselect" name="musthave" size="6" multiple="multiple" style="height:100px!important">
+<select class="catselect" name="musthave" size="6" multiple="multiple">
+<?php var musthave = get_the_author_meta( 'musthave_categories', $user->ID ); ?>
+<!-- <?php echo implode(',', $musthave ) ); ?> -->
+<?php wp_list_categories('orderby=name&include=' . implode(',', $musthave ) ); ?>
 <option>123</option>
 <option>34242</option>
 <option>123</option>
