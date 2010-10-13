@@ -3,7 +3,7 @@
 Plugin Name: Force Categories
 Plugin URI: http://github.com/BryanH/Force_Categories
 Description: Force posts by a user to include one or more specified categories (custom taxonomies) and/or prevent that user from assigning some categories (custom taxonomies) to her posts.
-Version: 0.925
+Version: 0.930
 Author: Bryan Hanks, PMP
 Author URI: http://www.chron.com/apps/adbxh0/
 License: GPLv3
@@ -28,7 +28,7 @@ if (!class_exists("ForceCategories")) {
 	class ForceCategories {
 		var $meta_sm = 'force_cats';
 		var $default_meta_sm = array (); // default values
-		function FollowSocialMedia() { //constructor
+		function ForceCategories() { //constructor
 			$this->register_plugin();
 			/* Widget settings. */
 			$widget_ops = array (
@@ -142,6 +142,7 @@ if (!class_exists("ForceCategories")) {
 		 * Get the styles installed
 		 */
 		function fc_style_enqueue() {
+			wp_enqueue_script('jquery'); // Ensure jQ is active.
 			$siteurl = get_option('siteurl');
 			$url = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/stylesheets/force_cat.css';
 			echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
