@@ -9,38 +9,39 @@
 <?php $musthave = get_the_author_meta( 'musthave_categories', $user->ID ); ?>
 <!-- <?php echo( implode(',', $musthave ) ); ?> -->
 <?php wp_list_categories('orderby=name&include=' . implode(',', $musthave ) ); ?>
-<option>123</option>
+<!--<option>123</option>
 <option>34242</option>
 <option>123</option>
-<option>34242</option>
+<option>34242</option> -->
 </select></div>
 <div id="mustactions" class="catactions"><input type="button" name="add_must" value="&#171;" /><br />
 <input type="button" name="remove_must" value="&#187;" /></div>
 <div id="categories" class="catpick">
 <h2>Categories</h2>
+
 <select id="categorylist" size="10" name="event-dropdown" style="height:100px!important" multiple="multiple">
- <?php
-  $categories=  get_categories(array('orderby' => 'name'));
-  foreach ($categories as $category) {
-  	$option = '<option value="' . $category->category_nicename . '">';
-	$option .= $category->cat_name;
-	//$option .= ' ('.$category->category_count.')';
+<?php
+$categories = get_terms('subsite', 'fields=names');
+foreach ($categories as $category) {
+	$option = '<option value="' . $category . '">';
+	$option .= $category;
 	$option .= '</option>';
 	echo $option;
-  }
- ?>
+}
+?>
 </select>
-
 </div>
 <div id="cantactions" class="catactions"><input type="button" name="add_cant" value="&#171;" /><br />
 <input type="button" name="remove_cant" value="&#187;" /></div>
 <div id="canthave" class="catpick">
 <h2>Can't have</h2>
 <select class="catselect" name="canthave" size="6" multiple="multiple" style="height:100px!important">
+<!--
 <option>123</option>
 <option>34242</option>
 <option>123</option>
 <option>34242</option>
+-->
 </select></div>
 <!--Spacer needed to anchor the parent-->
 <div class="spacer"></div>
