@@ -12,7 +12,8 @@
 
 .catselect{
   border:3px blue inset;
-  width:105px
+  width:105px;
+  height: 100%
 }
 
 .dropcap{

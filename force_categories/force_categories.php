@@ -3,7 +3,7 @@
 Plugin Name: Force Categories
 Plugin URI: http://github.com/BryanH/Force_Categories
 Description: Force posts by a user to include one or more specified categories (custom taxonomies) and/or prevent that user from assigning some categories (custom taxonomies) to her posts.
-Version: 1.0
+Version: 0.925
 Author: Bryan Hanks, PMP
 Author URI: http://www.chron.com/apps/adbxh0/
 License: GPLv3
@@ -43,18 +43,18 @@ if (!class_exists("ForceCategories")) {
 			 * Set up taxonomy for niche crap - jam the round peg into the octagonal hole.
 			 * 'cause nothing says "Success" like forcing a blog platform to be a
 			 */
-			 $taxonomy_name = $this->plugin->com . 'subsite';
-			register_taxonomy( $taxonomy_name, 'post', array (
-				'hierarchical' => true,
-				'label' => __('SubSite'),
-				'query_var' => true,
-				'show_tagcloud' => false,
-				'rewrite' => true
-			));
+			$taxonomy_name = $this->plugin->com . 'subsite';
+			/*			register_taxonomy( "chubb"$taxonomy_name, 'post', array (
+							'hierarchical' => true,
+							'label' => 'SubSite',
+							'query_var' => true,
+							'show_tagcloud' => false,
+							'rewrite' => true
+						));*/
 			/*
 			 * POUND that
 			 */
-			 wp_insert_term( "Featured", $taxonomy_name, array(
+			/* wp_insert_term( "Featured", $taxonomy_name, array(
 			  'description' => 'Featured posts that will display in the "Featured"/"Spotlight" area',
 			  'slug' => 'featured',
 			  )
@@ -65,14 +65,14 @@ if (!class_exists("ForceCategories")) {
 			  'slug' => 'home',
 			  )
 			 );
-			 /*
+
 			  * Kill some kittens
-			  */
+
 			 wp_insert_term( "Voices", $taxonomy_name, array(
 			  'description' => 'Voices posts',
 			  'slug' => 'voices',
 			  )
-			 );
+			 );*/
 		}
 		// Generic plugin functionality by John Blackbourn
 		function register_plugin() {
@@ -99,6 +99,16 @@ if (!class_exists("ForceCategories")) {
 					'sanitize'
 				);
 			register_setting($this->plugin->dom, $this->plugin->dom, $callback);
+		}
+		/*
+		 * Verify the current user can edit the user record
+		 * Parameter: user_id - id of user
+		 * Returns: (nothing) or exception if fail
+		 */
+		function check_edit_authorization($user_id) {
+			if (!current_user_can('edit_user', $user_id)) {
+				wp_die(__('You do not have sufficient permissions to edit this user.'));
+			}
 		}
 		/*
 			* Retrieves the value of the key from a form's values
@@ -132,17 +142,18 @@ if (!class_exists("ForceCategories")) {
 		 * Get the styles installed
 		 */
 		function fc_style_enqueue() {
-			$css_source = $this->get_css_location("force_cat.css");
-			//			wp_enqueue_style($this->plugin->dom, "/wp-content/plugins/force_categories/stylesheets/force_cat.css");
-			wp_enqueue_style($this->plugin->dom, $css_source);
-			//			wp_print_styles($this->plugin->dom);
-			echo "<!-- style should go here \n{$css_source}\n-->";
+			$siteurl = get_option('siteurl');
+			$url = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/stylesheets/force_cat.css';
+			echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
 		}
 		/*
 		 * Option screen
 		 */
 		function fc_options($user) {
-			check_edit_authorization($user);
+			//			check_edit_authorization($user);
+			if (!current_user_can('edit_user', $user)) {
+				wp_die(__('You do not have sufficient permissions to edit this user.'));
+			}
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "options.php"); ?>
 <?php
@@ -167,16 +178,6 @@ if (!class_exists("ForceCategories")) {
 				$this->plugin->dir . $admin_css,
 				$this->plugin->url . $admin_css
 			);
-		}
-		/*
-		 * Verify the current user can edit the user record
-		 * Parameter: user_id - id of user
-		 * Returns: (nothing) or exception if fail
-		 */
-		function check_edit_authorization($user_id) {
-			if (!current_user_can('edit_user', $user_id)) {
-				wp_die(__('You do not have sufficient permissions to edit this user.'));
-			}
 		}
 	}
 }

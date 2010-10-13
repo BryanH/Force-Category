@@ -1,4 +1,4 @@
-<h3>Force Categories settings</h3>
+<h3><div id="icon-users" class="icon32"></div> Force Categories settings</h3>
 
 <p><span class="dropcap">M</span><strong>ust have</strong> categories will be assigned to every post by this user, whereas <strong>can&#8217;t have</strong> categories can never be assigned to any posts by this user.</p>
 <div id="catres"><!--Spacer needed to anchor the parent-->
@@ -6,8 +6,8 @@
 <div id="musthave" class="catpick">
 <h2>Must have</h2>
 <select class="catselect" name="musthave" size="6" multiple="multiple">
-<?php var musthave = get_the_author_meta( 'musthave_categories', $user->ID ); ?>
-<!-- <?php echo implode(',', $musthave ) ); ?> -->
+<?php $musthave = get_the_author_meta( 'musthave_categories', $user->ID ); ?>
+<!-- <?php echo( implode(',', $musthave ) ); ?> -->
 <?php wp_list_categories('orderby=name&include=' . implode(',', $musthave ) ); ?>
 <option>123</option>
 <option>34242</option>
