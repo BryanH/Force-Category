@@ -43,14 +43,16 @@ if (!class_exists("ForceCategories")) {
 			 * Set up taxonomy for niche crap - jam the round peg into the octagonal hole.
 			 * 'cause nothing says "Success" like forcing a blog platform to be a
 			 */
+			 /*
 			$taxonomy_name = $this->plugin->com . 'subsite';
-			/*			register_taxonomy( "chubb"$taxonomy_name, 'post', array (
+						register_taxonomy( "chubb", 'post', array (
 							'hierarchical' => true,
 							'label' => 'SubSite',
 							'query_var' => true,
 							'show_tagcloud' => false,
 							'rewrite' => true
-						));*/
+						));
+			*/
 			/*
 			 * POUND that
 			 */
