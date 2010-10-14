@@ -1,8 +1,10 @@
 <script type="text/javascript">
 /*<![CDATA[*/
-function add_category(destinationID, sourceID) {
+function add_category(destinationID, sourceID, valFieldID) {
   var mustHave = [],
-      i, targetList = jQuery("#" + destinationID);
+      i,
+      targetList = jQuery("#" + destinationID),
+      valueField = jQuery('#' + valFieldID);
   jQuery("#" + sourceID + " :selected").each(function (i, selected) {
     mustHave[i] = jQuery(selected).text();
     jQuery(selected).remove();
@@ -11,6 +13,12 @@ function add_category(destinationID, sourceID) {
   mustHave = mustHave.sort();
   for (i = 0; i < mustHave.length; i++) {
     jQuery("#" + destinationID + "").append('<li>' + mustHave[i] + '</li>');
+  }
+
+  if( 0 == valueField.val().length) {
+	valueField.val(mustHave.join(','));
+  } else {
+  	valueField.val(valueField.val() + ',' + mustHave.join(','));
   }
 /*
    jQuery(".musthave_list").click(function(){
@@ -35,7 +43,7 @@ function add_category(destinationID, sourceID) {
 
 <h3><div id="icon-users" class="icon32"></div> Force Categories settings</h3>
 
-<p><span class="dropcap">M</span><strong>ust have</strong> categories will be assigned to every post by this user, whereas <strong>can&#8217;t have</strong> categories can never be assigned to any posts by this user.</p>
+<p><span class="dropcap">M</span><strong>ust have</strong> categories will be assigned to every post or page created or edited by this user, whereas <strong>can&#8217;t have</strong> categories can never be assigned to any posts or pages created or edited by this user.</p>
 <div id="catres"><!--Spacer needed to anchor the parent-->
 <div class="spacer"></div>
 <div class="catpick">
@@ -46,9 +54,11 @@ foreach( $musthave as $musthave ): ?>
 <li class="musthave_list" id="<?= $musthave ?>"><?= $musthave ?></li>
 <?php endforeach; ?>
 </ul>
+
+<h6>(Click category to remove)</h6>
 <input type="hidden" id="musthaveval" name="musthaveval" value="<?= implode(',', $musthave ); ?>" />
 </div>
-<div id="mustactions" class="catactions"><input type="button" name="add_must" value="&#171;" onclick="add_category('musthave', 'categorylist')" /></div>
+<div id="mustactions" class="catactions"><input type="button" name="add_must" value="&#171;" onclick="add_category('musthave', 'categorylist', 'musthaveval')" /></div>
 <div id="categories" class="catpick">
 <h2>Categories</h2>
 <select id="categorylist" size="10" name="event-dropdown" style="height:100px!important" multiple="multiple">
@@ -63,7 +73,7 @@ foreach ($categories as $category) {
 ?>
 </select>
 </div>
-<div id="cantactions" class="catactions"><input type="button" name="add_cant" value="&#187;" onclick="add_category('canthave', 'categorylist')" /></div>
+<div id="cantactions" class="catactions"><input type="button" name="add_cant" value="&#187;" onclick="add_category('canthave', 'categorylist', 'canthaveval')" /></div>
 <div class="catpick">
 <h2>Can't have</h2>
 <ul id="canthave" class="catselect">
@@ -72,6 +82,7 @@ foreach( $canthave as $canthave ): ?>
 <li id="<?= $canthave ?>"><?= $canthave ?> ***X***</li>
 <?php endforeach; ?>
 </ul>
+<h6>(Click category to remove)</h6>
 <input type="hidden" id="canthaveval" name="canthaveval" value="<?= implode(',', $canthave ); ?>" />
 </div>
 <!--Spacer needed to anchor the parent-->

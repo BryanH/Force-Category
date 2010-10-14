@@ -6,13 +6,15 @@
   width:20px
 }
 
-.catpick{
-  width:140px
+.catpick,#categorylist{
+  width:190px
 }
 
 .catselect{
   border:3px blue inset;
+/*
   width:105px;
+*/
   height: 100% !important
 }
 
@@ -34,8 +36,10 @@
   border:5px #554702 dashed;
   width:700px
 }
-
 #mustactions,#categories,#cantactions,.catpick{
   float:left;
-  padding:0 20px
+  margin: 0 20px
+}
+#mustactions,#cantactions,.catpick{
+  margin: 0 5px;
 }

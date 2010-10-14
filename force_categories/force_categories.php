@@ -166,8 +166,8 @@ if (!class_exists("ForceCategories")) {
 		}
 		function save_fc_options($user_id) {
 			check_edit_authorization($user_id);
-			update_user_meta($user_id, 'canthave_categories', $_POST['canthave']);
-			update_user_meta($user_id, 'musthave_categories', $_POST['musthave']);
+			update_user_meta($user_id, 'canthave_categories', $_POST['canthaveval']);
+			update_user_meta($user_id, 'musthave_categories', $_POST['musthaveval']);
 		}
 		/*
 		 * Obtains the url and file location of a given CSS
