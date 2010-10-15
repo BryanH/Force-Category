@@ -43,7 +43,7 @@ if (!class_exists("ForceCategories")) {
 			 * Set up taxonomy for niche crap - jam the round peg into the octagonal hole.
 			 * 'cause nothing says "Success" like forcing a blog platform to be a
 			 */
-			 /*
+			/*
 			$taxonomy_name = $this->plugin->com . 'subsite';
 						register_taxonomy( "chubb", 'post', array (
 							'hierarchical' => true,
@@ -84,10 +84,10 @@ if (!class_exists("ForceCategories")) {
 				'dir' => WP_PLUGIN_DIR . '/' . basename(dirname(__FILE__))
 			);
 			$this->settings = get_option($this->plugin->dom);
-			if (!$this->settings) {
-				add_option($this->plugin->dom, $this->defaults, true, true);
-				$this->settings = $this->defaults;
-			}
+			/*			if (!$this->settings) {
+							add_option($this->plugin->dom, $this->defaults, true, true);
+							$this->settings = $this->defaults;
+						}*/
 			load_plugin_textdomain($this->plugin->dom, false, $this->plugin->dom);
 			add_action('admin_init', array (
 				$this,
@@ -157,17 +157,50 @@ if (!class_exists("ForceCategories")) {
 			if (!current_user_can('edit_user', $user)) {
 				wp_die(__('You do not have sufficient permissions to edit this user.'));
 			}
+			/* Form Setup */
+			$musthaves = get_the_author_meta('musthave_categories', $user->ID);
+			$musthaves_flat = "";
+			if (2 > count($musthaves)) {
+				$musthaves = array (
+					"---"
+				);
+			} else {
+				$musthaves_flat = implode(',', $musthaves);
+			}
+			$canthaves = get_the_author_meta('canthave_categories', $user->ID);
+			$canthaves_flat = "";
+			if (2 > count($canthaves)) {
+				$canthaves = array (
+					"---"
+				);
+			} else {
+				$canthaves_flat = implode(',', $canthaves);
+			}
+			/* TODO: only get cats that aren't already assigned */
+			$categories = get_terms('subsite', 'fields=names');
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "options.php"); ?>
 <?php
 
-			add_action('personal_options_update', 'save_fc_options');
-			add_action('edit_user_profile_update', 'save_fc_options');
 		}
 		function save_fc_options($user_id) {
-			check_edit_authorization($user_id);
-			update_user_meta($user_id, 'canthave_categories', $_POST['canthaveval']);
-			update_user_meta($user_id, 'musthave_categories', $_POST['musthaveval']);
+			/*check_edit_authorization($user_id);*/
+			if (!current_user_can('edit_user', $user_id)) {
+				wp_die(__('You do not have sufficient permissions to edit this user.'));
+			}
+
+			$canthaveval = array ();
+			$cant_explode = explode(',', $_POST['canthaveval']);
+			$musthaveval = array ();
+			$must_explode = explode(',', $_POST['musthaveval']);
+			if (false != $cant_explode) {
+				$canthaveval = $cant_explode;
+			}
+			if (false != $must_explode) {
+				$musthaveval = $must_explode;
+			}
+			update_user_meta($user_id, 'canthave_categories', $canthaveval);
+			update_user_meta($user_id, 'musthave_categories', $musthaveval);
 		}
 		/*
 		 * Obtains the url and file location of a given CSS
@@ -202,6 +235,10 @@ if (isset ($force_cats)) {
 			& $force_cats,
 			'fc_style_enqueue'
 		));
+			add_action('personal_options_update', array (
+			& $force_cats,'save_fc_options'));
+			add_action('edit_user_profile_update', array (
+			& $force_cats,'save_fc_options'));
 		//		add_action('admin_init', array (
 		//			& $force_cats,
 		//			'register_mysettings'
