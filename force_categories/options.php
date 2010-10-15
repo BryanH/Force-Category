@@ -50,8 +50,6 @@ function add_category(destinationID, sourceID, valFieldID) {
 <div class="catpick">
 <h2>Must have</h2>
 <ul class="catselect" id="musthave">
-
-<!-- <?= count( $musthaves );?> | [<?= $musthaves ?>] | id: <?= $user->ID ?> -->
 <?php
 foreach( $musthaves as $musthave_value ):
 	$musthave_value  = esc_attr($musthave_value);

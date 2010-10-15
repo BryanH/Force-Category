@@ -150,34 +150,39 @@ if (!class_exists("ForceCategories")) {
 			echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
 		}
 		/*
-		 * Option screen
+		 * Plugin options
 		 */
-		function fc_options($user) {
+		 function fc_options() {
+		 	wp_options
+?>
+<?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "plugin_options.php"); ?>
+<?php
+		 }
+		/*
+		 * User profile screen
+		 */
+		function fc_user_profile($user) {
 			//			check_edit_authorization($user);
 			if (!current_user_can('edit_user', $user)) {
 				wp_die(__('You do not have sufficient permissions to edit this user.'));
 			}
 			/* Form Setup */
 			$musthaves = get_the_author_meta('musthave_categories', $user->ID);
-			$musthaves_flat = "";
-			if (2 > count($musthaves)) {
-				$musthaves = array (
-					"---"
-				);
-			} else {
-				$musthaves_flat = implode(',', $musthaves);
+			if( 1 > count($musthaves) ) {
+				$musthaves = array ();
 			}
+			$musthaves_flat = implode(',', $musthaves);
+
 			$canthaves = get_the_author_meta('canthave_categories', $user->ID);
-			$canthaves_flat = "";
-			if (2 > count($canthaves)) {
-				$canthaves = array (
-					"---"
-				);
-			} else {
-				$canthaves_flat = implode(',', $canthaves);
+			if( 1 > count($canthaves) ) {
+				$canthaves = array ();
 			}
+			$canthaves_flat = implode(',', $canthaves);
+
 			/* TODO: only get cats that aren't already assigned */
-			$categories = get_terms('subsite', 'fields=names');
+			$categories_in_use = array_merge( $musthaves, $canthaves );
+			$categories = array_diff( get_terms('subsite', 'fields=names'), $categories_in_use );
+
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "options.php"); ?>
 <?php
@@ -225,11 +230,11 @@ if (isset ($force_cats)) {
 	if (is_admin()) { // admin actions
 		add_action('edit_user_profile', array (
 			& $force_cats,
-			'fc_options'
+			'fc_user_profile'
 		));
 		add_action('show_user_profile', array (
 			& $force_cats,
-			'fc_options'
+			'fc_user_profile'
 		));
 		add_action('admin_head', array (
 			& $force_cats,
