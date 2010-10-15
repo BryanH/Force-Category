@@ -48,7 +48,7 @@ function add_category(destinationID, sourceID, valFieldID) {
 <div id="catres"><!--Spacer needed to anchor the parent-->
 <div class="spacer"></div>
 <div class="catpick">
-<h2>Must have</h2>
+<h3>Must have</h3>
 <ul class="catselect" id="musthave">
 <?php
 foreach( $musthaves as $musthave_value ):
@@ -63,7 +63,7 @@ foreach( $musthaves as $musthave_value ):
 </div>
 <div id="mustactions" class="catactions"><input type="button" name="add_must" value="&#171;" onclick="add_category('musthave', 'categorylist', 'musthaveval')" /></div>
 <div id="categories" class="catpick">
-<h2>Categories</h2>
+<h3>Categories</h3>
 <select id="categorylist" size="10" name="event-dropdown" style="height:100px!important" multiple="multiple">
 <?php
 foreach ($categories as $category):
@@ -76,7 +76,7 @@ endforeach;
 </div>
 <div id="cantactions" class="catactions"><input type="button" name="add_cant" value="&#187;" onclick="add_category('canthave', 'categorylist', 'canthaveval')" /></div>
 <div class="catpick">
-<h2>Can't have</h2>
+<h3>Can't have</h3>
 <ul id="canthave" class="catselect">
 <?php
 foreach( $canthaves as $canthave_value ):

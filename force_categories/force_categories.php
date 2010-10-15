@@ -27,7 +27,9 @@ License: GPLv3
 if (!class_exists("ForceCategories")) {
 	class ForceCategories {
 		var $meta_sm = 'force_cats';
-		var $default_meta_sm = array (); // default values
+		var $defaults = array (
+			'use_taxonomy' => 'subsite'
+		); // default values
 		function ForceCategories() { //constructor
 			$this->register_plugin();
 			/* Widget settings. */
@@ -84,10 +86,10 @@ if (!class_exists("ForceCategories")) {
 				'dir' => WP_PLUGIN_DIR . '/' . basename(dirname(__FILE__))
 			);
 			$this->settings = get_option($this->plugin->dom);
-			/*			if (!$this->settings) {
-							add_option($this->plugin->dom, $this->defaults, true, true);
-							$this->settings = $this->defaults;
-						}*/
+			if (!$this->settings) {
+				add_option($this->plugin->dom, $this->defaults, true, true);
+				$this->settings = $this->defaults;
+			}
 			load_plugin_textdomain($this->plugin->dom, false, $this->plugin->dom);
 			add_action('admin_init', array (
 				$this,
@@ -149,15 +151,25 @@ if (!class_exists("ForceCategories")) {
 			$url = $siteurl . '/wp-content/plugins/' . basename(dirname(__FILE__)) . '/stylesheets/force_cat.css';
 			echo "<link rel='stylesheet' type='text/css' href='$url' />\n";
 		}
+		/**
+		 * hook for update_wpmu_options to save any sitewide settings for this plugin
+		 *
+		 */
+		function update_sitewide_options() {
+			if ($_POST['taxonomy_to_use']) {
+				update_site_option('force_categories', $_POST['taxonomy_to_use']);
+			}
+		}
 		/*
 		 * Plugin options
 		 */
-		 function fc_options() {
-		 	wp_options
+		function add_sitewide_options() {
+			$taxonomy_to_use = get_site_option('force_categories', esc_attr($defaults['use_taxonomy']));
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "plugin_options.php"); ?>
 <?php
-		 }
+
+		}
 		/*
 		 * User profile screen
 		 */
@@ -168,21 +180,22 @@ if (!class_exists("ForceCategories")) {
 			}
 			/* Form Setup */
 			$musthaves = get_the_author_meta('musthave_categories', $user->ID);
-			if( 1 > count($musthaves) ) {
+			if (1 > count($musthaves)) {
 				$musthaves = array ();
 			}
 			$musthaves_flat = implode(',', $musthaves);
-
 			$canthaves = get_the_author_meta('canthave_categories', $user->ID);
-			if( 1 > count($canthaves) ) {
+			if (1 > count($canthaves)) {
 				$canthaves = array ();
 			}
 			$canthaves_flat = implode(',', $canthaves);
-
-			/* TODO: only get cats that aren't already assigned */
-			$categories_in_use = array_merge( $musthaves, $canthaves );
-			$categories = array_diff( get_terms('subsite', 'fields=names'), $categories_in_use );
-
+			// only get cats that aren't already assigned
+			$categories_in_use = array_merge($musthaves, $canthaves);
+			$taxonomy_to_use = get_site_option('force_categories', 'not set');
+			if( 'not set' == $taxonomy_to_use ) {
+				wp_die(__("<h2>Taxonomy/Category to use has not been set. You must go to the super-admin options page to do this first.</h2>"));
+			}
+			$categories = array_diff(get_terms($taxonomy_to_use, 'fields=names'), $categories_in_use);
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "options.php"); ?>
 <?php
@@ -193,7 +206,6 @@ if (!class_exists("ForceCategories")) {
 			if (!current_user_can('edit_user', $user_id)) {
 				wp_die(__('You do not have sufficient permissions to edit this user.'));
 			}
-
 			$canthaveval = array ();
 			$cant_explode = explode(',', $_POST['canthaveval']);
 			$musthaveval = array ();
@@ -220,6 +232,14 @@ if (!class_exists("ForceCategories")) {
 				$this->plugin->url . $admin_css
 			);
 		}
+		/*
+		 * Force or prohibit
+		 * TODO - finish
+		 */
+		function save_post($post_id, $post) {
+			if ( 'case-study' == $post){
+			}
+		}
 	}
 }
 if (class_exists("ForceCategories")) {
@@ -240,14 +260,26 @@ if (isset ($force_cats)) {
 			& $force_cats,
 			'fc_style_enqueue'
 		));
-			add_action('personal_options_update', array (
-			& $force_cats,'save_fc_options'));
-			add_action('edit_user_profile_update', array (
-			& $force_cats,'save_fc_options'));
-		//		add_action('admin_init', array (
-		//			& $force_cats,
-		//			'register_mysettings'
-		//		));
+		add_action('personal_options_update', array (
+			& $force_cats,
+			'save_fc_options'
+		));
+		add_action('edit_user_profile_update', array (
+			& $force_cats,
+			'save_fc_options'
+		));
+		add_action('wpmu_options', array (
+			& $force_cats,
+			'add_sitewide_options'
+		));
+		add_action('update_wpmu_options', array (
+			& $force_cats,
+			'update_sitewide_options'
+		));
+		add_action('save_post', array (
+			& $force_cats,
+			'save_post'
+		));
 	} else {
 		// non-admin enqueues, actions, and filters
 	}
