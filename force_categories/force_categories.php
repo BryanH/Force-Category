@@ -237,8 +237,18 @@ if (!class_exists("ForceCategories")) {
 		 * TODO - finish
 		 */
 		function save_post($post_id, $post) {
-			if ( 'case-study' == $post){
-			}
+			$taxonomy = get_site_option( 'force_categories' );
+			$author_id = $post->author;
+			$must_haves = get_user_meta($author_id, 'musthave_categories');
+			$cant_haves = get_user_meta($author_id, 'canthave_categories');
+			wp_set_post_terms( $post_id, $must_haves, $taxonomy, true);
+//			wp_set_post_terms( $post_id, $cant_haves, $taxonomy, false);
+		}
+		/*
+		 * Show only main well posts
+		 */
+		function show_only_main_well_posts( $query ) {
+			query_posts(array( 'subsite' => 'mainwell'));
 		}
 	}
 }
@@ -279,10 +289,15 @@ if (isset ($force_cats)) {
 		add_action('save_post', array (
 			& $force_cats,
 			'save_post'
-		));
+		));add_action('pre_get_posts', array (
+			& $force_cats,'show_only_main_well_posts' ));
+
 	} else {
 		// non-admin enqueues, actions, and filters
 	}
 	// TODO: Filters here
-}
+/*	add_filter( '', array(
+	& $force_cats, 'main_well'
+	));
+*/}
 ?>
