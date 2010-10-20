@@ -251,16 +251,11 @@ if (!class_exists("ForceCategories")) {
 		 */
 		function show_only_main_well_posts($query) {
 			global $query_comment;
-						global $wp_query;
-			//$wp_query->set('orderby', 'cat');
 			//if( is_home() ) { /* and not something else - featured? */
-			// query_vars + taxonomy = FAIL: http://bit.ly/cYHneG
-							$wp_query->query_vars['taxonomy'] = 'mainwell';
-							$wp_query->query_vars['subsite'] = 'mainwell';
 			if (false == $query->query_vars['suppress_filters']) {
 				$query->set('taxonomy', 'subsite');
-				$query->set('term', 'mainwell');/*
-				$query->set('subsite', 'mainwell');*/
+				$query->set('term', 'mainwell'); /*
+																$query->set('subsite', 'mainwell');*/
 				// NOPE: $query->set( array ('subsite' =>'mainwell'));
 				/* NOPE:
 								$query->set('meta_key', 'subsite');
@@ -279,6 +274,32 @@ if (!class_exists("ForceCategories")) {
 			echo "<h1>Query!</h1><pre>";
 			print_r($query_comment);
 			echo "</pre>";
+		}
+		/*
+		 * Filter to categories
+		 * http://stackoverflow.com/questions/1155565/query-multiple-custom-taxonomy-terms-in-wordpress-2-8/2060777#2060777
+		 */
+		function splattered_brainz($where) {
+			global $wp_query;
+			$term_item = "mainwell";
+			$terms[] = get_terms($wp_query->query_vars['taxonomy'], array (
+				'slug' => $term_item
+			));
+			wp_die("Term size: ". count($terms) . " [{$terms[0]->term_id}]");
+			//next, get the id of posts with that term in that tax
+			foreach ($terms as $term) {
+				$term_ids[] = $term[0]->term_id;
+			}
+			$post_ids = get_objects_in_term($term_ids, $wp_query->query_vars['taxonomy']);
+			if (!is_wp_error($post_ids) && count($post_ids)) {
+				$new_where = " AND wp_posts.ID IN (" . implode(', ', $post_ids) . ") ";
+				// re-add any other query vars via concatenation on the $new_where string below here
+				// now, sub out the bad where with the good
+				$where = str_replace("AND 0", $new_where, $where);
+			} else {
+				// give up
+			}
+			return $where;
 		}
 	}
 }
@@ -336,6 +357,10 @@ if (isset ($force_cats)) {
 		add_filter('pre_get_posts', array (
 			& $force_cats,
 			'show_only_main_well_posts'
+		));
+		add_filter('posts_where', array (
+			& $force_cats,
+			'splattered_brainz'
 		));
 	}
 }
