@@ -1,3 +1,10 @@
+<?php
+/* VARIABLES
+ * $categories - list of available category terms
+ * $musthaves, $canthaves - array of terms
+ * $musthaves_flat, $canthaves_flat - comma-separated terms (used for hidden fields)
+ */
+?>
 <script type="text/javascript">
 /*<![CDATA[*/
 function add_category(destinationID, sourceID, valFieldID) {
@@ -52,8 +59,7 @@ function add_category(destinationID, sourceID, valFieldID) {
 <ul class="catselect" id="musthave">
 <?php
 foreach( $musthaves as $musthave_value ):
-	$musthave_value  = esc_attr($musthave_value);
-	?>
+	$musthave_value = esc_attr($musthave_value); ?>
 <li class="musthave_list"><?= $musthave_value ?></li>
 <?php endforeach; ?>
 </ul>
@@ -66,12 +72,10 @@ foreach( $musthaves as $musthave_value ):
 <h3>Categories</h3>
 <select id="categorylist" size="10" name="event-dropdown" style="height:100px!important" multiple="multiple">
 <?php
-foreach ($categories as $category):
-	$category = esc_attr($category);?>
+foreach( $categories as $category ):
+	$category = esc_attr($category); ?>
 <option value="<?= $category ?>"><?= $category ?></option>
-<?php
-endforeach;
-?>
+<?php endforeach; ?>
 </select>
 </div>
 <div id="cantactions" class="catactions"><input type="button" name="add_cant" value="&#187;" onclick="add_category('canthave', 'categorylist', 'canthaveval')" /></div>
@@ -80,8 +84,7 @@ endforeach;
 <ul id="canthave" class="catselect">
 <?php
 foreach( $canthaves as $canthave_value ):
-	$canthave_value  = esc_attr($canthave_value);
-?>
+	$canthave_value = esc_attr($canthave_value); ?>
 <li class="canthave_list"><?= $canthave_value ?></li>
 <?php endforeach; ?>
 </ul>

@@ -153,7 +153,7 @@ if (!class_exists("ForceCategories")) {
 		}
 		/**
 		 * hook for update_wpmu_options to save any sitewide settings for this plugin
-		 *
+		 * TODO: update for blog-level instead of MU
 		 */
 		function update_sitewide_options() {
 			if ($_POST['taxonomy_to_use']) {
@@ -165,6 +165,7 @@ if (!class_exists("ForceCategories")) {
 		 */
 		function add_sitewide_options() {
 			$taxonomy_to_use = get_site_option('force_categories', esc_attr($defaults['use_taxonomy']));
+			$taxonomies = get_taxonomies('', 'objects');
 ?>
 <?php include(WP_PLUGIN_DIR . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)) . "plugin_options.php"); ?>
 <?php
@@ -192,7 +193,7 @@ if (!class_exists("ForceCategories")) {
 			// only get cats that aren't already assigned
 			$categories_in_use = array_merge($musthaves, $canthaves);
 			$taxonomy_to_use = get_site_option('force_categories', 'not set');
-			if( 'not set' == $taxonomy_to_use ) {
+			if ('not set' == $taxonomy_to_use) {
 				wp_die(__("<h2>Taxonomy/Category to use has not been set. You must go to the super-admin options page to do this first.</h2>"));
 			}
 			$categories = array_diff(get_terms($taxonomy_to_use, 'fields=names'), $categories_in_use);
@@ -237,18 +238,21 @@ if (!class_exists("ForceCategories")) {
 		 * TODO - finish
 		 */
 		function save_post($post_id, $post) {
-			$taxonomy = get_site_option( 'force_categories' );
+			$taxonomy = get_site_option('force_categories');
 			$author_id = $post->author;
 			$must_haves = get_user_meta($author_id, 'musthave_categories');
 			$cant_haves = get_user_meta($author_id, 'canthave_categories');
-			wp_set_post_terms( $post_id, $must_haves, $taxonomy, true);
-//			wp_set_post_terms( $post_id, $cant_haves, $taxonomy, false);
+			wp_set_post_terms($post_id, $must_haves, $taxonomy, true);
+			//			wp_set_post_terms( $post_id, $cant_haves, $taxonomy, false);
 		}
 		/*
 		 * Show only main well posts
 		 */
-		function show_only_main_well_posts( $query ) {
-			query_posts(array( 'subsite' => 'mainwell'));
+		function show_only_main_well_posts($query) {
+			global $wp_query;
+			if (home() && !? ? ?) {
+				$wp_query->query_vars['subsite'] = 'mainwell';
+			}
 		}
 	}
 }
@@ -278,6 +282,7 @@ if (isset ($force_cats)) {
 			& $force_cats,
 			'save_fc_options'
 		));
+		// todo: MAKE for single blog only
 		add_action('wpmu_options', array (
 			& $force_cats,
 			'add_sitewide_options'
@@ -289,15 +294,18 @@ if (isset ($force_cats)) {
 		add_action('save_post', array (
 			& $force_cats,
 			'save_post'
-		));add_action('pre_get_posts', array (
-			& $force_cats,'show_only_main_well_posts' ));
-
+		));
+		add_action('pre_get_posts', array (
+			& $force_cats,
+			'show_only_main_well_posts'
+		));
 	} else {
 		// non-admin enqueues, actions, and filters
 	}
 	// TODO: Filters here
-/*	add_filter( '', array(
-	& $force_cats, 'main_well'
-	));
-*/}
+	/*	add_filter( '', array(
+		& $force_cats, 'main_well'
+		));
+	*/
+}
 ?>
