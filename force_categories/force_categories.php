@@ -3,7 +3,7 @@
 Plugin Name: Force Categories
 Plugin URI: http://github.com/BryanH/Force_Categories
 Description: Force posts by a user to include one or more specified categories (custom taxonomies) and/or prevent that user from assigning some categories (custom taxonomies) to her posts.
-Version: 0.930
+Version: 0.945
 Author: Bryan Hanks, PMP
 Author URI: http://www.chron.com/apps/adbxh0/
 License: GPLv3
@@ -238,21 +238,47 @@ if (!class_exists("ForceCategories")) {
 		 * TODO - finish
 		 */
 		function save_post($post_id, $post) {
-			$taxonomy = get_site_option('force_categories');
+			//			$taxonomy = get_site_option('force_categories', 'not set');
+			$taxonomy = 'subsite';
 			$author_id = $post->author;
 			$must_haves = get_user_meta($author_id, 'musthave_categories');
 			$cant_haves = get_user_meta($author_id, 'canthave_categories');
-			wp_set_post_terms($post_id, $must_haves, $taxonomy, true);
+			/////wp_set_post_terms($post_id, $must_haves, $taxonomy, true);
 			//			wp_set_post_terms( $post_id, $cant_haves, $taxonomy, false);
 		}
 		/*
 		 * Show only main well posts
 		 */
 		function show_only_main_well_posts($query) {
-			global $wp_query;
-			if (home() && !? ? ?) {
-				$wp_query->query_vars['subsite'] = 'mainwell';
+			global $query_comment;
+						global $wp_query;
+			//$wp_query->set('orderby', 'cat');
+			//if( is_home() ) { /* and not something else - featured? */
+			// query_vars + taxonomy = FAIL: http://bit.ly/cYHneG
+							$wp_query->query_vars['taxonomy'] = 'mainwell';
+							$wp_query->query_vars['subsite'] = 'mainwell';
+			if (false == $query->query_vars['suppress_filters']) {
+				$query->set('taxonomy', 'subsite');
+				$query->set('term', 'mainwell');/*
+				$query->set('subsite', 'mainwell');*/
+				// NOPE: $query->set( array ('subsite' =>'mainwell'));
+				/* NOPE:
+								$query->set('meta_key', 'subsite');
+								$query->set('meta_value', 'mainwell');
+								*/
+				$query->set('posts_per_page', 5);
+				//			//	$query->set('posts_per_page', 3);
 			}
+			$query_comment = $query;
+			return $query;
+			//}
+		}
+		function echo_query() { //print it into the footer
+			//			wp_die("AHAHAHAHAHA");
+			global $query_comment;
+			echo "<h1>Query!</h1><pre>";
+			print_r($query_comment);
+			echo "</pre>";
 		}
 	}
 }
@@ -261,7 +287,7 @@ if (class_exists("ForceCategories")) {
 }
 if (isset ($force_cats)) {
 	// TODO: Actions here
-	if (is_admin()) { // admin actions
+	if (is_admin()) { // admin page actions
 		add_action('edit_user_profile', array (
 			& $force_cats,
 			'fc_user_profile'
@@ -295,17 +321,22 @@ if (isset ($force_cats)) {
 			& $force_cats,
 			'save_post'
 		));
-		add_action('pre_get_posts', array (
+		/*add_action('pre_get_posts', array (
+			& $force_cats,
+			'show_only_main_well_posts'
+		));*/
+	} else {
+		// Non-Admin enqueues, actions, and filters
+		// Actions
+		add_action('wp_footer', array (
+			& $force_cats,
+			'echo_query'
+		));
+		// Filters
+		add_filter('pre_get_posts', array (
 			& $force_cats,
 			'show_only_main_well_posts'
 		));
-	} else {
-		// non-admin enqueues, actions, and filters
 	}
-	// TODO: Filters here
-	/*	add_filter( '', array(
-		& $force_cats, 'main_well'
-		));
-	*/
 }
 ?>
