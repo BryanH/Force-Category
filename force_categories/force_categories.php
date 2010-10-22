@@ -285,7 +285,7 @@ if (!class_exists("ForceCategories")) {
 			$terms[] = get_terms($wp_query->query_vars['taxonomy'], array (
 				'slug' => $term_item
 			));
-			wp_die("Term size: ". count($terms) . " [{$terms[0]->term_id}]");
+//			wp_die("Term size: ". count($terms) . " [{$terms[0]->term_id}]");
 			//next, get the id of posts with that term in that tax
 			foreach ($terms as $term) {
 				$term_ids[] = $term[0]->term_id;
